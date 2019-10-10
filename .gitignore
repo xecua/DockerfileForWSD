@@ -2,6 +2,7 @@
 cabocha-*.tar.bz2
 CRF++-*.tar.gz
 /workspace
+/files
 
 # MacOS
 .DS_Store

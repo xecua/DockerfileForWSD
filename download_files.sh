@@ -1,3 +1,4 @@
+#!/bin/bash
 mkdir -p files
 
 # download CRF++ 0.58
@@ -9,3 +10,6 @@ FILE_NAME=cabocha-0.69.tar.bz2
 curl -sc /tmp/cookie "https://drive.google.com/uc?export=download&id=${FILE_ID}" > /dev/null
 CODE="$(awk '/_warning_/ {print $NF}' /tmp/cookie)"
 curl -Lb /tmp/cookie "https://drive.google.com/uc?export=download&confirm=${CODE}&id=${FILE_ID}" -o ./files/${FILE_NAME}
+
+# download IPAexFont
+curl -L  "https://oscdl.ipa.go.jp/IPAexfont/ipaexg00301.zip" > ./files/font.zip

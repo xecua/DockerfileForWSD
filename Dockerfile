@@ -6,9 +6,10 @@ WORKDIR /root
 
 ADD ./files/CRF++-0.58.tar.gz ./
 ADD ./files/cabocha-0.69.tar.bz2 ./
+ADD ./files/font.zip ./
 
 RUN apt update
-RUN apt install -y git aria2 curl wget bzip2 sudo make file xz-utils gcc g++
+RUN apt install -y git aria2 curl wget bzip2 sudo make file xz-utils gcc g++ unzip
 
 # install pyenv and anaconda3
 
@@ -17,13 +18,7 @@ RUN echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
 RUN echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
 RUN echo 'eval "$(pyenv init -)"' >> ~/.bash_profile
 # install Anaconda and setup vim keybind for jupyter
-RUN source ~/.bash_profile && pyenv install anaconda3-2019.07 && pyenv global anaconda3-2019.07 && \
-    conda install -c conda-forge jupyter_contrib_nbextensions && \
-    mkdir -p $(jupyter --data-dir)/nbextensions && \
-    cd $(jupyter --data-dir)/nbextensions && \
-    git clone https://github.com/lambdalisue/jupyter-vim-binding vim_binding && \
-    jupyter nbextension enable vim_binding/vim_binding
-
+RUN source ~/.bash_profile && pyenv install anaconda3-2019.07 && pyenv global anaconda3-2019.07
 
 # install mecab
 
@@ -63,14 +58,19 @@ RUN source ~/.bash_profile && jupyter notebook --generate-config \
     -e "s:^#c.NotebookApp.ip = .*$:c.NotebookApp.ip = '*':" \
     -e "s:^#c.NotebookApp.open_browser = .*$:c.NotebookApp.open_browser = False:" \
     -e "s:^#c.NotebookApp.notebook_dir = .*$:c.NotebookApp.notebook_dir = '${HOME}/workspace':" \
-    ${HOME}/.jupyter/jupyter_notebook_config.py
+    ${HOME}/.jupyter/jupyter_notebook_config.py && \
+    conda install -c conda-forge jupyter_contrib_nbextensions && \
+    mkdir -p $(jupyter --data-dir)/nbextensions && \
+    cd $(jupyter --data-dir)/nbextensions && \
+    git clone https://github.com/lambdalisue/jupyter-vim-binding vim_binding && \
+    jupyter nbextension enable vim_binding/vim_binding
 
-RUN curl -L  "https://oscdl.ipa.go.jp/IPAexfont/ipaexg00301.zip" > font.zip && \
-    apt install unzip && \
-    unzip font.zip && \
+RUN unzip font.zip && \
     cp ipaexg00301/ipaexg.ttf /root/.pyenv/versions/anaconda3-2019.07/lib/python3.7/site-packages/matplotlib/mpl-data/fonts/ttf/ && \
     echo "font.family : IPAexGothic" >> /root/.pyenv/versions/anaconda3-2019.07/lib/python3.7/site-packages/matplotlib/mpl-data/matplotlibrc && \
     rm -r ./.cache
+
+RUN ln -s /var/lib/mecab /usr/local/lib/mecab
 
 ENTRYPOINT [ "/bin/bash", "-c" ]
 EXPOSE 8888
